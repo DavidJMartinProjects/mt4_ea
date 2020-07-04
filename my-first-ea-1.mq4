@@ -49,14 +49,14 @@ void OnTick()
      buy = iCustom(NULL,0,"half-trend nrp", 2, false, true, 5, 1);
      sell = iCustom(NULL,0,"half-trend nrp", 3, false, true, 6, 1);
      
-     if(buy != EMPTY_VALUE && sell > 1){
+     if(buy != EMPTY_VALUE && buy < 2147483647){
          // close open shorts
          Print("buy: " + buy);
          // Open Buy Order
          OrderSend(_Symbol,OP_BUY,LotSize,Ask,Slippage,Ask-StopLoss*_Point,Ask+TakeProfit*_Point,"BUY",MagicNumber);          
          // set buys_open flag to true    
          buys_open = true;  
-      } else if(sell != EMPTY_VALUE && sell < 1){
+      } else if(sell != EMPTY_VALUE && sell < 2147483647){
          // close open buys
          Print("sell: " + sell);         
          //Open Sell Order         
