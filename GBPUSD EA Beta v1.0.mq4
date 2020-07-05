@@ -7,6 +7,10 @@
 #property link      ""
 #property version   "1.02"
 #property strict
+
+const double opening_balance = AccountBalance();
+double balance_after_last_trade = AccountBalance();
+
 //--- input parameters
 input int      TakeProfit=400;
 input int      StopLoss=400;
@@ -14,12 +18,23 @@ input double   LotSize=0.2;
 input int      Slippage=20;
 input int      MagicNumber=5555;
 
+extern string __c8="----------------------------------";
+extern bool    KeepTextOnTop     = true;//Disable the chart in foreground CrapTx setting so the candles do not obscure the text
+extern int     DisplayX          = 100;
+extern int     DisplayY          = 100;
+extern int     fontSise          = 8;
+extern string  fontName          = "Courier New";
+extern color   colour            = Yellow;
+
 int orderTicket = 0;
 double trades_taken = 0;
 string day_of_week = "";
 
 bool buys_open = false;
 bool sells_open = false;
+
+int count_wins = 0;
+int count_losses = 0;
 
 double buy;
 double sell;
@@ -29,6 +44,8 @@ double slow_uptrend;
 double slow_downtrend;
 double buy_entry_signal;
 double sell_entry_signal;
+
+int DisplayCount = 0;
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -49,7 +66,7 @@ void OnTick()
   {     
      getDayOfWeek();
      if(tradingAllowed() == true) {
-         showSummary();
+         showDashboard();         
          if(TotalOpenOrders() == 0) {
 
              buy = getHalfTrendStatus(5, 1);
@@ -143,24 +160,75 @@ void getDayOfWeek() {
    }   
 }
 
-void showSummary() {
+void showDashboard() {
 
-   string comment = 
-      "\n" + 
-      "Current Day: " + day_of_week + "\n" +
-      "Current Time: " + TimeCurrent() + "\n" +
-      "\n" + 
-      "Trades Taken: " + trades_taken + "\n";
+//   string comment = 
+//      "\n" + 
+//      "Current Day: " + day_of_week + "\n" +
+//      "Current Time: " + TimeCurrent() + "\n" +
+//      "\n" + 
+
+      UpdateWinLossStatus();
       
-    if(OrderSelect(orderTicket, SELECT_BY_TICKET)==true) 
-    { 
-      comment += "Trade "+orderTicket+": Entry = " + OrderOpenPrice()  + "\n"; 
-      comment += "Trade "+orderTicket+": Take Profit = " + OrderClosePrice()  + "\n"; 
-    } 
-    else 
-      comment += "No Open Trades.";
+      // Build Dashboard Messages      
+      DisplayCount=0;
+      AddDashBoardMessage("---------------------------");
+      AddDashBoardMessage("The Coon EA Dashboard");
+      AddDashBoardMessage("---------------------------");
+      AddDashBoardMessage("");      
+      AddDashBoardMessage("Current Day: " + day_of_week);
+      AddDashBoardMessage("Trades Taken: " + trades_taken);
+      AddDashBoardMessage("");
+      AddDashBoardMessage("Winners: " + count_wins);
+      AddDashBoardMessage("Losers: " + count_losses);
+      AddDashBoardMessage("");
+      AddDashBoardMessage("Profit this session: " + DoubleToString(( AccountBalance() - opening_balance ), 2));
+      AddDashBoardMessage("---------------------------");
+  
+  
+}
+
+void UpdateWinLossStatus() {
+   if(balance_after_last_trade != AccountBalance() && balance_after_last_trade - AccountBalance() < 20 ) {
+      count_wins++;      
+   }
+   else if(balance_after_last_trade != AccountBalance() && balance_after_last_trade - AccountBalance() > 20 ) {
+      count_losses++;
+   }      
+   balance_after_last_trade = AccountBalance();   
+}
+
+void AddDashBoardMessage(string message) {
+
+   DisplayCount++;
+   Display(message);   
+}
+
+void Display(string text)
+{
+  string lab_str = "EA-" + IntegerToString(DisplayCount);  
+  double ofset = 0;  
+  
+  ObjectCreate("EA-BG",OBJ_RECTANGLE_LABEL,0,0,0);
+  ObjectSet("EA-BG", OBJPROP_XDISTANCE, DisplayX-20);
+  ObjectSet("EA-BG", OBJPROP_YDISTANCE, DisplayY-10);
+  ObjectSet("EA-BG", OBJPROP_XSIZE,252);
+  ObjectSet("EA-BG", OBJPROP_YSIZE,250);
+  ObjectSet("EA-BG", OBJPROP_BGCOLOR,clrBlack);
+   //  ObjectSet("EA-BG", OBJPROP_BORDER_TYPE,BORDER_SUNKEN);
+  ObjectSet("EA-BG", OBJPROP_CORNER,CORNER_LEFT_UPPER);
+  ObjectSet("EA-BG", OBJPROP_STYLE,STYLE_SOLID);
+  ObjectSet("EA-BG", OBJPROP_COLOR,colour);
+  ObjectSet("EA-BG", OBJPROP_WIDTH,0);
+  ObjectSet("EA-BG", OBJPROP_BACK,false);
+
+  ObjectCreate(lab_str, OBJ_LABEL, 0, 0, 0);
+  ObjectSet(lab_str, OBJPROP_CORNER, 0);
+  ObjectSet(lab_str, OBJPROP_XDISTANCE, DisplayX + ofset);
+  ObjectSet(lab_str, OBJPROP_YDISTANCE, DisplayY+DisplayCount*(fontSise+9));
+  ObjectSet(lab_str, OBJPROP_BACK, false);
+  ObjectSetText(lab_str, text, fontSise, fontName, colour);
     
-    Comment(comment);
 }
 
 bool tradingAllowed() {
@@ -174,6 +242,17 @@ bool tradingAllowed() {
    }
    return true;
 }
+
+double getLotSize() {
+   if(AccountBalance()/1000 == 0) {
+      return LotSize;
+   }    
+   return ( (AccountBalance()/1000) + 1 ) * LotSize;   
+}
+
+//===============================================
+//===============================================
+//===============================================
 
 
 bool goodtimetotrade()
