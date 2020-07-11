@@ -342,23 +342,23 @@ bool CheckAllowedTradingDay() {
 
 double CalcLots(double Risk)
 {
-   double tmpLot = 0, MinLot = 0, MaxLot = 0;
-   MinLot = MarketInfo(Symbol(),MODE_MINLOT);
-   MaxLot = MarketInfo(Symbol(),MODE_MAXLOT);
-   tmpLot = NormalizeDouble(AccountBalance()*Risk/1000,1.5);
-
-   if(tmpLot < MinLot)
-   {
-      Print("LotSize is Smaller than the broker allow minimum Lot!");
-      return(MinLot);
-   }
-   if(tmpLot > maxLotSize)
-   {
-      Print ("LotSize is Greater than the allow minimum Lot!");
-      return(maxLotSize);
-   }
-   return(tmpLot);
-   //return LotSize;
+//   double tmpLot = 0, MinLot = 0, MaxLot = 0;
+//   MinLot = MarketInfo(Symbol(),MODE_MINLOT);
+//   MaxLot = MarketInfo(Symbol(),MODE_MAXLOT);
+//   tmpLot = NormalizeDouble(AccountBalance()*Risk/1000,1.5);
+//
+//   if(tmpLot < MinLot)
+//   {
+//      Print("LotSize is Smaller than the broker allow minimum Lot!");
+//      return(MinLot);
+//   }
+//   if(tmpLot > maxLotSize)
+//   {
+//      Print ("LotSize is Greater than the allow minimum Lot!");
+//      return(maxLotSize);
+//   }
+//   return(tmpLot);
+   return LotSize;
 }
 
 void getDayOfWeek() {
