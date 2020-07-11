@@ -218,7 +218,7 @@ void showDashboard() {
       AddDashBoardMessage("Oh Dear! EA Dashboard");
       AddDashBoardMessage("---------------------------");
       AddDashBoardMessage("");      
-      AddDashBoardMessage("Days running: " + day_running);
+      AddDashBoardMessage("Days running: " + days_running);
       AddDashBoardMessage("Day of week: " + day_of_week);
       AddDashBoardMessage("Trading Status: " + tradingHoursStatus + " " +Hour());
       AddDashBoardMessage("Strategy: Scalper");
@@ -328,6 +328,7 @@ bool CheckAllowedTradingDay() {
    }
 
    if(previous_day_of_week != day_of_week) {
+        previous_day_of_week = day_of_week;
         days_running++;
    }
 
