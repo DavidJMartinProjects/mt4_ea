@@ -24,7 +24,7 @@ bool buys_open = false;
 bool orders_open = false;
 int day_running = 0;
 string previous_day_of_week = "";
-const string noTradeDays[] = {"Sunday", "Monday"};
+const string noTradeDays[] = {"Sunday"};
 color tradeStatuscolour = Yellow;
 
 extern string __c8="----------------------------------";
